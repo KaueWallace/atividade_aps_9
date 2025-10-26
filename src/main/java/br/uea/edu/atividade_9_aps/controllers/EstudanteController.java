@@ -1,0 +1,65 @@
+package br.uea.edu.atividade_9_aps.controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.uea.edu.atividade_9_aps.domain.Estudante;
+import br.uea.edu.atividade_9_aps.service.EstudanteService;
+
+@RestController
+@RequestMapping("/estudantes")
+public class EstudanteController {
+
+    @Autowired
+    private EstudanteService estudanteService;
+
+    @GetMapping
+    public ResponseEntity<List<Estudante>> listarEstudantes(){
+        return ResponseEntity.ok(estudanteService.listar());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Estudante> buscarPorCodigo(@PathVariable Integer id){
+        return estudanteService.buscarPorCodigo(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Estudante> salvar(@RequestBody Estudante estudante){
+        Estudante estudanteSalva = estudanteService.salvar(estudante);
+        return ResponseEntity.status(HttpStatus.CREATED).body(estudanteSalva);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Estudante> atualizar(@PathVariable Integer id, @RequestBody Estudante estudante){
+        if (!estudanteService.buscarPorCodigo(id).isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Estudante estudanteSalva = estudanteService.atualizar(id, estudante);
+        return ResponseEntity.status(HttpStatus.OK).body(estudanteSalva);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable Integer id){
+        if (!estudanteService.buscarPorCodigo(id).isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        estudanteService.deletar(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+}   
