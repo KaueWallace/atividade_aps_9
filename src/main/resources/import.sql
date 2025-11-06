@@ -33,3 +33,8 @@ INSERT INTO estudante_turma (estudante_id, turma_id) VALUES (7, 2);
 INSERT INTO estudante_turma (estudante_id, turma_id) VALUES (8, 2);
 INSERT INTO estudante_turma (estudante_id, turma_id) VALUES (9, 2);
 INSERT INTO estudante_turma (estudante_id, turma_id) VALUES (10, 2);
+
+INSERT INTO usuario (username, password, role)
+VALUES ('ana.silva', '$2a$10$Dow1PtvTrq4noKZyGCu9JO8KR7mtEoFoZQOMHns2qN89mEzWyxRea', 'ROLE_USER');
+
+
