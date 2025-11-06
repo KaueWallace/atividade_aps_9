@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.uea.edu.atividade_9_aps.domain.Estudante;
+import br.uea.edu.atividade_9_aps.dto.EstudanteDTO;
 import br.uea.edu.atividade_9_aps.service.EstudanteService;
 
 @RestController
@@ -27,35 +28,39 @@ public class EstudanteController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    public ResponseEntity<List<Estudante>> listarEstudantes(){
+    public ResponseEntity<List<EstudanteDTO>> listarEstudantes(){
         return ResponseEntity.ok(estudanteService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Estudante> buscarPorCodigo(@PathVariable Integer id){
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<EstudanteDTO> buscarPorCodigo(@PathVariable Integer id){
         return estudanteService.buscarPorCodigo(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping
-    public ResponseEntity<Estudante> salvar(@RequestBody Estudante estudante){
-        Estudante estudanteSalva = estudanteService.salvar(estudante);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EstudanteDTO> salvar(@RequestBody Estudante estudante){
+        EstudanteDTO estudanteSalva = estudanteService.salvar(estudante);
         return ResponseEntity.status(HttpStatus.CREATED).body(estudanteSalva);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Estudante> atualizar(@PathVariable Integer id, @RequestBody Estudante estudante){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EstudanteDTO> atualizar(@PathVariable Integer id, @RequestBody Estudante estudante){
         if (!estudanteService.buscarPorCodigo(id).isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Estudante estudanteSalva = estudanteService.atualizar(id, estudante);
+        EstudanteDTO estudanteSalva = estudanteService.atualizar(id, estudante);
         return ResponseEntity.status(HttpStatus.OK).body(estudanteSalva);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable Integer id){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id){
         if (!estudanteService.buscarPorCodigo(id).isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

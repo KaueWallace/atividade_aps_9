@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.uea.edu.atividade_9_aps.domain.Turma;
+import br.uea.edu.atividade_9_aps.dto.TurmaDTO;
 import br.uea.edu.atividade_9_aps.service.TurmaService;
 
 @RestController
@@ -25,35 +27,40 @@ public class TurmaController {
     private TurmaService turmaService;
 
     @GetMapping
-    public ResponseEntity<List<Turma>> listarTurmas(){
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<List<TurmaDTO>> listarTurmas(){
         return ResponseEntity.ok(turmaService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Turma> buscarPorCodigo(@PathVariable Integer id){
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<TurmaDTO> buscarPorCodigo(@PathVariable Integer id){
         return turmaService.buscarPorCodigo(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping
-    public ResponseEntity<Turma> salvar(@RequestBody Turma turma){
-        Turma turmaSalva = turmaService.salvar(turma);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TurmaDTO> salvar(@RequestBody Turma turma){
+        TurmaDTO turmaSalva = turmaService.salvar(turma);
         return ResponseEntity.status(HttpStatus.CREATED).body(turmaSalva);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Turma> atualizar(@PathVariable Integer id, @RequestBody Turma turma){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TurmaDTO> atualizar(@PathVariable Integer id, @RequestBody Turma turma){
         if (!turmaService.buscarPorCodigo(id).isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Turma turmaSalva = turmaService.atualizar(id, turma);
+        TurmaDTO turmaSalva = turmaService.atualizar(id, turma);
         return ResponseEntity.status(HttpStatus.OK).body(turmaSalva);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable Integer id){
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id){
         if (!turmaService.buscarPorCodigo(id).isPresent()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
